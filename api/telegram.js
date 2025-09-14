@@ -16,8 +16,8 @@ export default async function handler(req, res) {
     try {
         const { message, type = 'payment' } = req.body;
         
-        // Configuration Telegram
-        const TELEGRAM_BOT_TOKEN = '8219481030:AAFlvMF148S2-fT-XmCVGyVEWZ_KR76YUkA';
+        // Configuration Telegram - TOKEN VALIDE !
+        const TELEGRAM_BOT_TOKEN = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
         const TELEGRAM_CHAT_ID = '6523794278';
         
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
