@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Simple</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 50px; 
+            text-align: center;
+            background: #f0f0f0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Simple Vercel</h1>
+    <p>Si vous voyez ça, Vercel fonctionne !</p>
+    
+    <button class="btn" onclick="testJS()">Test JavaScript</button>
+    <button class="btn" onclick="testTelegram()">Test Telegram</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 20px; background: white; border-radius: 5px;"></div>
+
+    <script>
+        function testJS() {
+            alert('✅ JavaScript fonctionne !');
+            document.getElementById('result').innerHTML = '<p style="color: green;">✅ JavaScript OK</p>';
+        }
+        
+        function testTelegram() {
+            document.getElementById('result').innerHTML = '<p>⏳ Test Telegram en cours...</p>';
+            
+            // Test direct avec votre token
+            const token = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
+            const chatId = '6523794278';
+            const message = '🧪 Test depuis Vercel !';
+            
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    document.getElementById('result').innerHTML = '<p style="color: green;">✅ Telegram OK - Message envoyé !</p>';
+                } else {
+                    document.getElementById('result').innerHTML = '<p style="color: red;">❌ Erreur Telegram: ' + data.description + '</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = '<p style="color: red;">❌ Erreur: ' + error.message + '</p>';
+            });
+        }
+    </script>
+</body>
+</html>
