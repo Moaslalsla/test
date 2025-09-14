@@ -297,6 +297,4 @@ def admin():
     pending_count=len(pending_orders),
     completed_count=len(completed_orders))
 
-# Export de l'application pour Vercel
-def handler(request):
-    return app(request.environ, lambda *args: None)
+# Point d'entrée pour Vercel - l'app Flask doit être accessible directement
