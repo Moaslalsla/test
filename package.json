@@ -1,0 +1,20 @@
+{
+  "name": "site-test-vercel",
+  "version": "1.0.0",
+  "description": "Site de test pour Vercel - HTML/CSS/JS pur",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s .",
+    "build": "echo 'Site statique - pas de build nécessaire'",
+    "dev": "serve -s . -l 3000"
+  },
+  "keywords": ["html", "css", "javascript", "static", "vercel"],
+  "author": "Test Vercel",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
