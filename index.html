@@ -282,6 +282,10 @@
                 <button type="button" class="pay-button" onclick="testTelegram()" style="background: #28a745; margin-top: 10px;">
                     🧪 Tester Telegram
                 </button>
+                
+                <button type="button" class="pay-button" onclick="testSimple()" style="background: #17a2b8; margin-top: 10px;">
+                    🔧 Test Simple
+                </button>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
@@ -509,6 +513,12 @@ Votre bot Telegram fonctionne parfaitement !`;
                 testButton.textContent = '🧪 Tester Telegram';
                 testButton.style.background = '#28a745';
             }, 3000);
+        }
+        
+        // Test simple pour diagnostiquer
+        function testSimple() {
+            alert('✅ JavaScript fonctionne !');
+            console.log('✅ Test simple réussi');
         }
         
         function showError(message) {
