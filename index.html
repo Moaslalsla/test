@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Acheteur Crypto Automatisé</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Acheteur Crypto Automatisé</h1>
+            <p>Interface moderne - Déploiement Vercel réussi ! 🚀</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-coins"></i> Formulaire d'achat</h2>
+                    <p>Configurez votre achat automatique de cryptomonnaies</p>
+                </div>
+                
+                <form id="orderForm" class="crypto-form">
+                    <div class="form-group">
+                        <label for="crypto">
+                            <i class="fab fa-bitcoin"></i> Cryptomonnaie
+                        </label>
+                        <select id="crypto" name="crypto" required>
+                            <option value="">Sélectionnez une crypto</option>
+                            <option value="BTC" data-icon="fab fa-bitcoin">Bitcoin (BTC)</option>
+                            <option value="ETH" data-icon="fab fa-ethereum">Ethereum (ETH)</option>
+                            <option value="ADA" data-icon="fas fa-coins">Cardano (ADA)</option>
+                            <option value="DOT" data-icon="fas fa-circle-dot">Polkadot (DOT)</option>
+                            <option value="SOL" data-icon="fas fa-sun">Solana (SOL)</option>
+                            <option value="MATIC" data-icon="fas fa-shapes">Polygon (MATIC)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">
+                            <i class="fas fa-euro-sign"></i> Montant (€)
+                        </label>
+                        <input type="number" id="amount" name="amount" min="10" max="50000" step="0.01" placeholder="100.00" required>
+                        <small class="form-hint">Minimum 10€ - Maximum 50,000€</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email de confirmation
+                        </label>
+                        <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="strategy">
+                            <i class="fas fa-chart-line"></i> Stratégie d'achat
+                        </label>
+                        <select id="strategy" name="strategy" required>
+                            <option value="">Choisissez une stratégie</option>
+                            <option value="instant">Achat instantané</option>
+                            <option value="dca">DCA - Achat périodique</option>
+                            <option value="limit">Ordre à cours limité</option>
+                            <option value="stop">Stop-loss automatique</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        <span>Lancer l'achat automatique</span>
+                        <div class="btn-shine"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalUsers">1,247</h3>
+                        <p>Utilisateurs actifs</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalOrders">8,932</h3>
+                        <p>Commandes traitées</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalVolume">€2.4M</h3>
+                        <p>Volume total</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="result" class="result-container"></div>
+
+        <div class="features">
+            <h2><i class="fas fa-star"></i> Fonctionnalités</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Sécurité maximale</h3>
+                    <p>Chiffrement bout en bout et authentification 2FA</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Exécution rapide</h3>
+                    <p>Ordres traités en moins de 100ms</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Analytics avancées</h3>
+                    <p>Suivi en temps réel de vos investissements</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Application mobile</h3>
+                    <p>Gérez vos cryptos depuis votre smartphone</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
