@@ -42,12 +42,21 @@
         function testTelegram() {
             document.getElementById('result').innerHTML = '<p>⏳ Test Telegram en cours...</p>';
             
-            // Test direct avec votre token
+            // Utiliser un proxy CORS pour contourner le blocage
             const token = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
             const chatId = '6523794278';
             const message = '🧪 Test depuis Vercel !';
             
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+            // Utiliser cors-anywhere comme proxy
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            
+            fetch(proxyUrl + telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
