@@ -1,19 +1,411 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>TEST VERCEL</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💳 Page de Paiement</title>
     <style>
-        body { 
-            background: red; 
-            color: white; 
-            font-size: 50px; 
-            text-align: center; 
-            padding: 100px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .payment-form {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .card-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .amount-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .currency {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .pay-button {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .payment-method img {
+            width: 40px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .security-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #2d5a2d;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .card-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>CA MARCHE !</h1>
-    <p>Si tu vois ça, Vercel fonctionne</p>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Paiement Sécurisé</h1>
+            <p>Finalisez votre commande en toute sécurité</p>
+        </div>
+
+        <div class="payment-form">
+            <div class="amount-display">
+                <div class="amount" id="totalAmount">99.99</div>
+                <div class="currency">€</div>
+            </div>
+
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>Méthode de paiement</label>
+                    <div class="payment-methods">
+                        <div class="payment-method selected" data-method="card">
+                            <div>💳</div>
+                            <div>Carte</div>
+                        </div>
+                        <div class="payment-method" data-method="paypal">
+                            <div>🅿️</div>
+                            <div>PayPal</div>
+                        </div>
+                        <div class="payment-method" data-method="apple">
+                            <div>🍎</div>
+                            <div>Apple Pay</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardNumber">Numéro de carte</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+
+                <div class="card-row">
+                    <div class="form-group">
+                        <label for="expiry">Date d'expiration</label>
+                        <input type="text" id="expiry" placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="zip">Code postal</label>
+                        <input type="text" id="zip" placeholder="75001" maxlength="5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Nom sur la carte</label>
+                    <input type="text" id="name" placeholder="Jean Dupont">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email de confirmation</label>
+                    <input type="email" id="email" placeholder="jean@example.com">
+                </div>
+
+                <button type="submit" class="pay-button" id="payButton">
+                    💳 Payer 99.99€
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Traitement du paiement...</div>
+                </div>
+
+                <div class="success-message" id="successMessage">
+                    ✅ Paiement réussi ! Vous recevrez un email de confirmation.
+                </div>
+
+                <div class="error-message" id="errorMessage">
+                    ❌ Erreur lors du paiement. Veuillez réessayer.
+                </div>
+            </form>
+
+            <div class="security-info">
+                🔒 Paiement 100% sécurisé - Données chiffrées SSL
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des méthodes de paiement
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+            });
+        });
+
+        // Formatage du numéro de carte
+        document.getElementById('cardNumber').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Formatage de la date d'expiration
+        document.getElementById('expiry').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Validation et soumission
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payButton = document.getElementById('payButton');
+            const loading = document.getElementById('loading');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Masquer les messages précédents
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // Validation basique
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const expiry = document.getElementById('expiry').value;
+            const cvv = document.getElementById('cvv').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            if (!cardNumber || cardNumber.length < 16) {
+                showError('Numéro de carte invalide');
+                return;
+            }
+            
+            if (!expiry || expiry.length < 5) {
+                showError('Date d\'expiration invalide');
+                return;
+            }
+            
+            if (!cvv || cvv.length < 3) {
+                showError('CVV invalide');
+                return;
+            }
+            
+            if (!name.trim()) {
+                showError('Nom requis');
+                return;
+            }
+            
+            if (!email.trim() || !email.includes('@')) {
+                showError('Email invalide');
+                return;
+            }
+            
+            // Simulation du paiement
+            payButton.disabled = true;
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                // 90% de chance de succès pour la démo
+                if (Math.random() > 0.1) {
+                    successMessage.style.display = 'block';
+                    payButton.textContent = '✅ Paiement réussi !';
+                } else {
+                    showError('Paiement refusé par la banque');
+                }
+                
+                payButton.disabled = false;
+            }, 2000);
+        });
+        
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.style.display = 'block';
+        }
+        
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.8s ease-out';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
