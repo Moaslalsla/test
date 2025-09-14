@@ -1,0 +1,23 @@
+{
+  "api_credentials": {
+    "api_key": "your_api_key_here",
+    "secret_key": "your_secret_key_here",
+    "sandbox": true
+  },
+  "default_settings": {
+    "from_currency": "EUR",
+    "to_currency": "BTC",
+    "amount": 100.0,
+    "customer_email": "votre_email@example.com",
+    "crypto_address": "votre_adresse_crypto_ici"
+  },
+  "security_settings": {
+    "enable_simulation_mode": true,
+    "require_manual_confirmation": true,
+    "max_amount_eur": 500.0
+  },
+  "notifications": {
+    "email_notifications": false,
+    "log_level": "INFO"
+  }
+}

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat du paiement - Switchere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .result-container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .result-header {
+            padding: 40px;
+            text-align: center;
+        }
+        .result-header.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        .result-header.failed {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+        }
+        .result-header.pending {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+        .result-header.cancelled {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .result-body {
+            padding: 40px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-cancelled {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .next-steps {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-container">
+            <!-- En-tête dynamique selon le statut -->
+            {% if status == 'completed' %}
+            <div class="result-header success">
+                <i class="fas fa-check-circle result-icon"></i>
+                <h1>Paiement réussi !</h1>
+                <p class="mb-0">Votre transaction a été traitée avec succès</p>
+            </div>
+            {% elif status == 'failed' %}
+            <div class="result-header failed">
+                <i class="fas fa-times-circle result-icon"></i>
+                <h1>Paiement échoué</h1>
+                <p class="mb-0">Une erreur s'est produite lors du traitement</p>
+            </div>
+            {% elif status == 'pending' %}
+            <div class="result-header pending">
+                <i class="fas fa-clock result-icon"></i>
+                <h1>Paiement en cours</h1>
+                <p class="mb-0">Votre transaction est en cours de traitement</p>
+            </div>
+            {% elif status == 'cancelled' %}
+            <div class="result-header cancelled">
+                <i class="fas fa-ban result-icon"></i>
+                <h1>Paiement annulé</h1>
+                <p class="mb-0">La transaction a été annulée</p>
+            </div>
+            {% else %}
+            <div class="result-header">
+                <i class="fas fa-question-circle result-icon"></i>
+                <h1>Statut inconnu</h1>
+                <p class="mb-0">Impossible de déterminer le statut de la transaction</p>
+            </div>
+            {% endif %}
+            
+            <div class="result-body">
+                <!-- Informations de la transaction -->
+                <div class="info-card">
+                    <h5><i class="fas fa-receipt"></i> Détails de la transaction</h5>
+                    
+                    {% if session_id %}
+                    <div class="info-row">
+                        <span class="info-label">Session ID:</span>
+                        <span class="info-value">{{ session_id }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-row">
+                        <span class="info-label">Statut:</span>
+                        <span class="status-badge status-{{ status }}">
+                            {% if status == 'completed' %}
+                                <i class="fas fa-check"></i> Complété
+                            {% elif status == 'failed' %}
+                                <i class="fas fa-times"></i> Échoué
+                            {% elif status == 'pending' %}
+                                <i class="fas fa-clock"></i> En attente
+                            {% elif status == 'cancelled' %}
+                                <i class="fas fa-ban"></i> Annulé
+                            {% else %}
+                                <i class="fas fa-question"></i> Inconnu
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if payment_data %}
+                    <div class="info-row">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value">{{ payment_data.get('created_at', 'Non disponible') }}</span>
+                    </div>
+                    
+                    {% if payment_data.get('amount') %}
+                    <div class="info-row">
+                        <span class="info-label">Montant:</span>
+                        <span class="info-value">
+                            {{ payment_data.get('amount', '') }} {{ payment_data.get('currency', '') }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if payment_data.get('crypto_amount') %}
+                    <div class="info-row">
+                        <span class="info-label">Crypto reçu:</span>
+                        <span class="info-value">
+                            {{ payment_data.get('crypto_amount', '') }} {{ payment_data.get('crypto_currency', '') }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if payment_data.get('transaction_hash') %}
+                    <div class="info-row">
+                        <span class="info-label">Hash transaction:</span>
+                        <span class="info-value">
+                            <code>{{ payment_data.get('transaction_hash', '')[:20] }}...</code>
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Étapes suivantes selon le statut -->
+                {% if status == 'completed' %}
+                <div class="next-steps">
+                    <h6><i class="fas fa-info-circle"></i> Prochaines étapes</h6>
+                    <ul class="mb-0">
+                        <li>Vos cryptomonnaies ont été envoyées à votre adresse</li>
+                        <li>Vérifiez votre portefeuille dans 10-30 minutes</li>
+                        <li>Un email de confirmation vous a été envoyé</li>
+                        <li>Conservez cette page pour vos archives</li>
+                    </ul>
+                </div>
+                
+                {% elif status == 'pending' %}
+                <div class="next-steps">
+                    <h6><i class="fas fa-hourglass-half"></i> Transaction en cours</h6>
+                    <ul class="mb-0">
+                        <li>Votre paiement est en cours de vérification</li>
+                        <li>Cela peut prendre 5 à 15 minutes</li>
+                        <li>Ne fermez pas cette page</li>
+                        <li>Vous recevrez une notification par email</li>
+                    </ul>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-primary" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i> Actualiser le statut
+                        </button>
+                    </div>
+                </div>
+                
+                {% elif status == 'failed' %}
+                <div class="next-steps">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Que faire maintenant ?</h6>
+                    <ul class="mb-0">
+                        <li>Vérifiez les informations de votre carte bancaire</li>
+                        <li>Assurez-vous d'avoir suffisamment de fonds</li>
+                        <li>Contactez votre banque si nécessaire</li>
+                        <li>Réessayez avec un autre mode de paiement</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-redo"></i> Réessayer
+                        </a>
+                    </div>
+                </div>
+                
+                {% elif status == 'cancelled' %}
+                <div class="next-steps">
+                    <h6><i class="fas fa-info-circle"></i> Transaction annulée</h6>
+                    <ul class="mb-0">
+                        <li>Aucun montant n'a été débité</li>
+                        <li>Vous pouvez recommencer une nouvelle transaction</li>
+                        <li>Vos données sont sécurisées</li>
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Boutons d'action -->
+                <div class="text-center mt-4">
+                    <a href="/" class="btn-home">
+                        <i class="fas fa-home"></i> Retour à l'accueil
+                    </a>
+                    
+                    {% if status == 'completed' %}
+                    <button class="btn btn-outline-secondary ms-3" onclick="window.print()">
+                        <i class="fas fa-print"></i> Imprimer le reçu
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Support -->
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-headset"></i> 
+                        Besoin d'aide ? Contactez notre 
+                        <a href="mailto:support@votresite.com">support client</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh pour les transactions en attente
+        {% if status == 'pending' %}
+        let refreshCount = 0;
+        const maxRefresh = 20; // Maximum 20 actualisations (10 minutes)
+        
+        function autoRefresh() {
+            if (refreshCount < maxRefresh) {
+                setTimeout(() => {
+                    refreshCount++;
+                    location.reload();
+                }, 30000); // Actualiser toutes les 30 secondes
+            }
+        }
+        
+        autoRefresh();
+        {% endif %}
+        
+        // Copier l'ID de session
+        function copySessionId() {
+            const sessionId = '{{ session_id }}';
+            navigator.clipboard.writeText(sessionId).then(() => {
+                alert('ID de session copié !');
+            });
+        }
+        
+        // Ajouter un gestionnaire de clic sur l'ID de session
+        document.addEventListener('DOMContentLoaded', function() {
+            const sessionElements = document.querySelectorAll('.info-value');
+            sessionElements.forEach(el => {
+                if (el.textContent.includes('{{ session_id }}')) {
+                    el.style.cursor = 'pointer';
+                    el.title = 'Cliquer pour copier';
+                    el.addEventListener('click', copySessionId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
