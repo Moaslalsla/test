@@ -131,11 +131,11 @@ MAIN_TEMPLATE = """
     <div class="container">
         <div class="header">
             <h1>🤖 Acheteur Crypto Automatisé</h1>
-            <p>Version simplifiée pour Vercel</p>
+            <p>Version Vercel - Déployé avec succès!</p>
         </div>
 
         <div class="card">
-            <h2>�� Formulaire d'achat</h2>
+            <h2>💰 Formulaire d'achat</h2>
             <form id="orderForm">
                 <div class="form-group">
                     <label for="crypto">Cryptomonnaie :</label>
@@ -297,6 +297,6 @@ def admin():
     pending_count=len(pending_orders),
     completed_count=len(completed_orders))
 
-# Point d'entrée pour Vercel
-if __name__ == "__main__":
-    app.run(debug=True)
+# Export de l'application pour Vercel
+def handler(request):
+    return app(request.environ, lambda *args: None)
