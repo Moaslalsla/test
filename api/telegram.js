@@ -13,9 +13,9 @@ function isPaymentMessage(message) {
     return paymentKeywords.some(keyword => text.includes(keyword));
 }
 
-// Fonction pour envoyer une notification au récepteur local
+// Fonction pour envoyer une notification au récepteur Vercel
 async function sendNotificationToLocalReceiver(telegramData, originalMessage) {
-    const notificationUrl = 'http://localhost:3014/notify';
+    const notificationUrl = 'https://test-alpha-lac-68.vercel.app/api/notifications';
     
     const notification = {
         id: telegramData.result?.message_id || Date.now(),

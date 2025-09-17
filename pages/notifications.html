@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications Cacapaybot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .notifications {
+            padding: 30px;
+        }
+        
+        .notification {
+            background: #f8f9fa;
+            border-left: 5px solid #ff6b6b;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification:hover {
+            transform: translateY(-2px);
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .notification-id {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .notification-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .notification-message {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-line;
+            margin-bottom: 15px;
+        }
+        
+        .notification-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .meta-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .meta-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .meta-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .refresh-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: #ee5a24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        
+        .empty h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Notifications Cacapaybot</h1>
+            <p>Surveillance des messages de paiement en temps réel</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalNotifications">0</div>
+                <div class="stat-label">Notifications totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastUpdate">-</div>
+                <div class="stat-label">Dernière mise à jour</div>
+            </div>
+        </div>
+        
+        <div class="notifications">
+            <button class="refresh-btn" onclick="loadNotifications()">🔄 Actualiser</button>
+            <div id="notificationsList">
+                <div class="loading">Chargement des notifications...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/api/notifications');
+                const data = await response.json();
+                
+                document.getElementById('totalNotifications').textContent = data.totalNotifications || 0;
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('fr-FR');
+                
+                const notificationsList = document.getElementById('notificationsList');
+                
+                if (data.notifications && data.notifications.length > 0) {
+                    notificationsList.innerHTML = data.notifications.map(notification => `
+                        <div class="notification">
+                            <div class="notification-header">
+                                <span class="notification-id">#${notification.id}</span>
+                                <span class="notification-time">${new Date(notification.timestamp).toLocaleString('fr-FR')}</span>
+                            </div>
+                            <div class="notification-message">${notification.message}</div>
+                            <div class="notification-meta">
+                                <div class="meta-item">
+                                    <div class="meta-label">Expéditeur</div>
+                                    <div class="meta-value">${notification.sender}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Type</div>
+                                    <div class="meta-value">${notification.type}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    notificationsList.innerHTML = `
+                        <div class="empty">
+                            <h3>📭 Aucune notification</h3>
+                            <p>Les notifications de paiement apparaîtront ici automatiquement</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des notifications:', error);
+                document.getElementById('notificationsList').innerHTML = `
+                    <div class="empty">
+                        <h3>❌ Erreur de chargement</h3>
+                        <p>Impossible de charger les notifications</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Charger les notifications au démarrage
+        loadNotifications();
+        
+        // Actualiser automatiquement toutes les 5 secondes
+        setInterval(loadNotifications, 5000);
+    </script>
+</body>
+</html>
