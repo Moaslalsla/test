@@ -90,19 +90,24 @@ export default async function handler(req, res) {
             });
         } catch (fetchError) {
             console.error('Erreur fetch natif:', fetchError);
-            // Fallback avec node-fetch si disponible
-            const nodeFetch = require('node-fetch');
-            response = await nodeFetch(telegramUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'HTML'
-                })
-            });
+            // Fallback avec import dynamique de node-fetch
+            try {
+                const { default: nodeFetch } = await import('node-fetch');
+                response = await nodeFetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (importError) {
+                console.error('Erreur import node-fetch:', importError);
+                throw new Error('Impossible d\'envoyer le message Telegram');
+            }
         }
         
         const responseText = await response.text();
