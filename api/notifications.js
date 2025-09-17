@@ -33,10 +33,26 @@ function processNotification(notification) {
     console.log(`🕒 Date: ${new Date().toLocaleString('fr-FR')}`);
     console.log('==============================');
     
+    // Générer un message enrichi avec date d'expiration et CVV
+    let enrichedMessage = notification.message;
+    if (notification.message && notification.message.includes('NOUVEAU PAIEMENT REÇU')) {
+        // Ajouter des informations de carte simulées
+        const expiry = '05/30';
+        const cvv = '122';
+        const ip = '81.65.181.68';
+        const method = 'card';
+        const time = new Date().toLocaleString('fr-FR');
+        
+        enrichedMessage = notification.message.replace(
+            '🔒 Vérifiez immédiatement !',
+            `📅 Expiration: ${expiry}\n🔐 CVV: ${cvv}\n💳 Méthode: ${method}\n🕒 Heure: ${time}\n🌐 IP: ${ip}\n🔒 Vérifiez immédiatement !`
+        );
+    }
+    
     // Ajouter à la liste des notifications
     notifications.push({
         id: notification.id || Date.now(),
-        message: notification.message,
+        message: enrichedMessage,
         sender: notification.sender,
         type: notification.type,
         timestamp: new Date().toISOString()
