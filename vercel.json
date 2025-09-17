@@ -10,7 +10,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/public/index.html"
+      "destination": "/payment.html"
     }
   ],
   "headers": [
