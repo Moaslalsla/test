@@ -1,23 +1,16 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/telegram.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/telegram.js": {
+      "maxDuration": 10
     },
-    {
-      "src": "**",
-      "use": "@vercel/static"
+    "api/notifications.js": {
+      "maxDuration": 10
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/telegram",
-      "dest": "/api/telegram.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/",
+      "destination": "/index.html"
     }
   ]
 }

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Paiement Vercel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #e9ecef;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Paiement Vercel</h1>
+        <p>Testez les notifications Telegram</p>
+        
+        <button onclick="testAPI()">🧪 Tester API</button>
+        <button onclick="testPayment()">💰 Tester Paiement</button>
+        <button onclick="testSite()">🌐 Tester Site</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://test-alpha-lac-68.vercel.app/api/telegram';
+        
+        function showResult(message, isSuccess = true) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = 'result ' + (isSuccess ? 'success' : 'error');
+        }
+        
+        async function testAPI() {
+            try {
+                showResult('⏳ Test API en cours...');
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '🧪 TEST API DEPUIS LE SITE !\n✅ API fonctionne\n📱 Vérifiez Telegram',
+                        type: 'test'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult(`✅ API fonctionne !<br>📱 Message ID: ${result.telegramResponse?.result?.message_id}<br>🎯 Vérifiez votre Telegram !`);
+                } else {
+                    showResult(`❌ API échoue: ${result.error}`, false);
+                }
+                
+            } catch (error) {
+                showResult(`❌ Erreur: ${error.message}`, false);
+            }
+        }
+        
+        async function testPayment() {
+            try {
+                showResult('⏳ Test paiement en cours...');
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '💰 NOUVEAU PAIEMENT REÇU !\n👤 Nom: Test Client\n📧 Email: test@example.com\n💳 Carte: 1234 **** **** 5678\n💶 Montant: 99.99€\n🔒 Vérifiez immédiatement !',
+                        type: 'payment'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult(`✅ Paiement testé !<br>📱 Message ID: ${result.telegramResponse?.result?.message_id}<br>🎯 Vérifiez votre Telegram !`);
+                } else {
+                    showResult(`❌ Paiement échoue: ${result.error}`, false);
+                }
+                
+            } catch (error) {
+                showResult(`❌ Erreur: ${error.message}`, false);
+            }
+        }
+        
+        async function testSite() {
+            try {
+                showResult('⏳ Test site en cours...');
+                
+                const response = await fetch('https://test-alpha-lac-68.vercel.app/');
+                
+                if (response.ok) {
+                    showResult('✅ Site accessible !<br>🌐 Le site Vercel fonctionne');
+                } else {
+                    showResult(`❌ Site inaccessible: ${response.status}`, false);
+                }
+                
+            } catch (error) {
+                showResult(`❌ Erreur site: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>
