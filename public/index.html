@@ -293,6 +293,15 @@
                          📋 Vérifier presse-papiers
                      </button>
                  </div>
+                 
+                 <div class="test-buttons">
+                     <button type="button" class="test-button" onclick="simulatePayment()">
+                         💰 Simuler paiement
+                     </button>
+                     <button type="button" class="test-button" onclick="forceCopy()">
+                         📋 Forcer copie
+                     </button>
+                 </div>
             </form>
             
             <div class="loading" id="loading">
@@ -654,6 +663,65 @@
             } catch (error) {
                 console.error('Erreur vérification presse-papiers:', error);
                 showResult('❌ Erreur lors de la vérification: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour simuler un paiement
+        async function simulatePayment() {
+            try {
+                console.log('💰 Simulation d\'un paiement...');
+                
+                const result = await ipcRenderer.invoke('simulate-payment');
+                
+                if (result && result.length > 0) {
+                    const message = result[0];
+                    showResult(`
+                        <h3>✅ Paiement simulé !</h3>
+                        <p><strong>Message ID:</strong> ${message.id}</p>
+                        <p><strong>Heure:</strong> ${new Date(message.timestamp).toLocaleString()}</p>
+                        <p><strong>Contenu:</strong></p>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; white-space: pre-wrap;">${message.message}</pre>
+                        <p>📋 Le message devrait être copié automatiquement !</p>
+                    `, true);
+                } else {
+                    showResult('❌ Erreur lors de la simulation du paiement', false);
+                }
+                
+            } catch (error) {
+                console.error('Erreur simulation paiement:', error);
+                showResult('❌ Erreur simulation paiement: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour forcer la copie
+        async function forceCopy() {
+            try {
+                console.log('📋 Forçage de la copie...');
+                
+                const testMessage = `💰 MESSAGE DE TEST FORCÉ !
+👤 Nom: Test Force
+📧 Email: test@force.com
+💳 Carte: 9999 **** **** 9999
+💶 Montant: 999.99€
+🔒 Vérifiez immédiatement !`;
+
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(testMessage);
+                    showResult('✅ Message forcé copié dans le presse-papiers !<br>Essayez Cmd+V pour coller !', true);
+                } else {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = testMessage;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showResult('✅ Message forcé copié (fallback) !<br>Essayez Cmd+V pour coller !', true);
+                }
+                
+            } catch (error) {
+                console.error('Erreur force copie:', error);
+                showResult('❌ Erreur force copie: ' + error.message, false);
             }
         }
     </script>
