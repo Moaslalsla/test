@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, Tray, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, Tray, nativeImage, clipboard } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
 
@@ -126,6 +126,26 @@ async function updateMessages() {
         // Mettre à jour le titre avec le nombre de messages
         if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.setTitle(`Cacapaybot Monitor - ${messages.length} messages détectés`);
+        }
+        
+        // Copier automatiquement le dernier message dans le presse-papiers
+        if (messages.length > 0) {
+            const lastMessage = messages[0]; // Le plus récent (premier dans la liste)
+            const messageText = lastMessage.message;
+            
+            // Copier dans le presse-papiers
+            clipboard.writeText(messageText);
+            console.log('📋 Message copié automatiquement dans le presse-papiers !');
+            console.log('📄 Contenu copié:', messageText.substring(0, 100) + '...');
+            
+            // Envoyer une notification à l'interface
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('message-copied', {
+                    message: messageText,
+                    id: lastMessage.id,
+                    timestamp: lastMessage.timestamp
+                });
+            }
         }
         
     } catch (error) {

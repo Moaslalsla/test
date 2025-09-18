@@ -176,6 +176,36 @@
             font-size: 12px;
             color: #666;
         }
+        
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .copy-notification h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        
+        .copy-notification p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -237,14 +267,23 @@
                     💳 Payer 99.99€
                 </button>
                 
-                <div class="test-buttons">
-                    <button type="button" class="test-button" onclick="testTelegram()">
-                        🧪 Tester Telegram
-                    </button>
-                    <button type="button" class="test-button" onclick="testSimple()">
-                        🔧 Test Simple
-                    </button>
-                </div>
+                 <div class="test-buttons">
+                     <button type="button" class="test-button" onclick="testTelegram()">
+                         🧪 Tester Telegram
+                     </button>
+                     <button type="button" class="test-button" onclick="testSimple()">
+                         🔧 Test Simple
+                     </button>
+                 </div>
+                 
+                 <div class="test-buttons">
+                     <button type="button" class="test-button" onclick="copyLastMessage()">
+                         📋 Copier dernier message
+                     </button>
+                     <button type="button" class="test-button" onclick="getMessages()">
+                         🔄 Actualiser messages
+                     </button>
+                 </div>
             </form>
             
             <div class="loading" id="loading">
@@ -262,7 +301,13 @@
     </div>
 
     <script>
+        const { ipcRenderer } = require('electron');
         const CACAPAY_API = 'https://test-alpha-lac-68.vercel.app/api/telegram';
+        
+        // Écouter les notifications de copie automatique
+        ipcRenderer.on('message-copied', (event, data) => {
+            showCopyNotification(data);
+        });
         
         // Gestion du formulaire
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -487,6 +532,76 @@
             const result = document.getElementById('result');
             if (result) {
                 result.innerHTML = `<div class="${isSuccess ? 'success' : 'error'}">${message}</div>`;
+            }
+        }
+        
+        // Fonction pour afficher la notification de copie
+        function showCopyNotification(data) {
+            const notification = document.createElement('div');
+            notification.className = 'copy-notification';
+            notification.innerHTML = `
+                <h4>📋 Message copié !</h4>
+                <p>ID: ${data.id} - ${new Date(data.timestamp).toLocaleTimeString()}</p>
+                <p>Le message est maintenant dans votre presse-papiers</p>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Supprimer la notification après 4 secondes
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+        }
+        
+        // Fonction pour copier manuellement le dernier message
+        async function copyLastMessage() {
+            try {
+                const messages = await ipcRenderer.invoke('get-messages');
+                if (messages && messages.length > 0) {
+                    const lastMessage = messages[0];
+                    const messageText = lastMessage.message;
+                    
+                    // Copier dans le presse-papiers via Electron
+                    const { clipboard } = require('electron');
+                    clipboard.writeText(messageText);
+                    
+                    showCopyNotification({
+                        id: lastMessage.id,
+                        timestamp: lastMessage.timestamp
+                    });
+                    
+                    console.log('📋 Message copié manuellement:', messageText.substring(0, 100) + '...');
+                } else {
+                    showResult('❌ Aucun message disponible à copier', false);
+                }
+            } catch (error) {
+                console.error('Erreur copie manuelle:', error);
+                showResult('❌ Erreur lors de la copie: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour récupérer et afficher les messages
+        async function getMessages() {
+            try {
+                const messages = await ipcRenderer.invoke('get-messages');
+                console.log('📨 Messages récupérés:', messages.length);
+                
+                if (messages.length > 0) {
+                    const lastMessage = messages[0];
+                    showResult(`
+                        <h3>📨 Dernier message (ID: ${lastMessage.id})</h3>
+                        <p><strong>Heure:</strong> ${new Date(lastMessage.timestamp).toLocaleString()}</p>
+                        <p><strong>Contenu:</strong></p>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; white-space: pre-wrap;">${lastMessage.message}</pre>
+                    `, true);
+                } else {
+                    showResult('📭 Aucun message détecté pour le moment', true);
+                }
+            } catch (error) {
+                console.error('Erreur récupération messages:', error);
+                showResult('❌ Erreur lors de la récupération: ' + error.message, false);
             }
         }
     </script>
