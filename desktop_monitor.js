@@ -133,18 +133,32 @@ async function updateMessages() {
             const lastMessage = messages[0]; // Le plus récent (premier dans la liste)
             const messageText = lastMessage.message;
             
-            // Copier dans le presse-papiers
-            clipboard.writeText(messageText);
-            console.log('📋 Message copié automatiquement dans le presse-papiers !');
-            console.log('📄 Contenu copié:', messageText.substring(0, 100) + '...');
-            
-            // Envoyer une notification à l'interface
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send('message-copied', {
-                    message: messageText,
-                    id: lastMessage.id,
-                    timestamp: lastMessage.timestamp
-                });
+            try {
+                // Copier dans le presse-papiers via Electron
+                clipboard.writeText(messageText);
+                console.log('📋 Message copié automatiquement dans le presse-papiers !');
+                console.log('📄 Contenu copié:', messageText.substring(0, 100) + '...');
+                
+                // Envoyer une notification à l'interface
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send('message-copied', {
+                        message: messageText,
+                        id: lastMessage.id,
+                        timestamp: lastMessage.timestamp
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Erreur lors de la copie:', error);
+                // Essayer de copier via l'interface web
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.executeJavaScript(`
+                        navigator.clipboard.writeText(\`${messageText.replace(/`/g, '\\`')}\`).then(() => {
+                            console.log('📋 Message copié via l\\'interface web');
+                        }).catch(err => {
+                            console.error('❌ Erreur copie interface web:', err);
+                        });
+                    `);
+                }
             }
         }
         

@@ -284,6 +284,15 @@
                          🔄 Actualiser messages
                      </button>
                  </div>
+                 
+                 <div class="test-buttons">
+                     <button type="button" class="test-button" onclick="testCopy()">
+                         🧪 Tester copie
+                     </button>
+                     <button type="button" class="test-button" onclick="checkClipboard()">
+                         📋 Vérifier presse-papiers
+                     </button>
+                 </div>
             </form>
             
             <div class="loading" id="loading">
@@ -563,9 +572,18 @@
                     const lastMessage = messages[0];
                     const messageText = lastMessage.message;
                     
-                    // Copier dans le presse-papiers via Electron
-                    const { clipboard } = require('electron');
-                    clipboard.writeText(messageText);
+                    // Copier dans le presse-papiers via l'API web
+                    if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(messageText);
+                    } else {
+                        // Fallback pour les anciens navigateurs
+                        const textArea = document.createElement('textarea');
+                        textArea.value = messageText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                    }
                     
                     showCopyNotification({
                         id: lastMessage.id,
@@ -602,6 +620,60 @@
             } catch (error) {
                 console.error('Erreur récupération messages:', error);
                 showResult('❌ Erreur lors de la récupération: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour tester la copie
+        async function testCopy() {
+            try {
+                const testMessage = `💰 TEST DE COPIE !
+👤 Nom: Test User
+📧 Email: test@example.com
+💳 Carte: 1234 **** **** 5678
+💶 Montant: 99.99€
+🔒 Vérifiez immédiatement !`;
+
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(testMessage);
+                    showResult('✅ Test de copie réussi !<br>Le message de test a été copié dans votre presse-papiers.<br>Essayez de coller avec Cmd+V !', true);
+                } else {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = testMessage;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showResult('✅ Test de copie réussi (fallback) !<br>Le message de test a été copié dans votre presse-papiers.', true);
+                }
+                
+                console.log('🧪 Test de copie effectué');
+            } catch (error) {
+                console.error('Erreur test copie:', error);
+                showResult('❌ Erreur lors du test de copie: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour vérifier le contenu du presse-papiers
+        async function checkClipboard() {
+            try {
+                if (navigator.clipboard) {
+                    const clipboardContent = await navigator.clipboard.readText();
+                    if (clipboardContent) {
+                        showResult(`
+                            <h3>📋 Contenu du presse-papiers</h3>
+                            <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; white-space: pre-wrap; max-height: 200px; overflow-y: auto;">${clipboardContent}</pre>
+                            <p><strong>Longueur:</strong> ${clipboardContent.length} caractères</p>
+                        `, true);
+                    } else {
+                        showResult('📭 Le presse-papiers est vide', true);
+                    }
+                } else {
+                    showResult('❌ API Clipboard non disponible dans ce navigateur', false);
+                }
+            } catch (error) {
+                console.error('Erreur vérification presse-papiers:', error);
+                showResult('❌ Erreur lors de la vérification: ' + error.message, false);
             }
         }
     </script>
