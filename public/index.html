@@ -302,6 +302,15 @@
                          📋 Forcer copie
                      </button>
                  </div>
+                 
+                 <div class="test-buttons">
+                     <button type="button" class="test-button" onclick="createTestMessage()">
+                         🧪 Créer message test
+                     </button>
+                     <button type="button" class="test-button" onclick="testDirectCopy()">
+                         📋 Test copie directe
+                     </button>
+                 </div>
             </form>
             
             <div class="loading" id="loading">
@@ -722,6 +731,80 @@
             } catch (error) {
                 console.error('Erreur force copie:', error);
                 showResult('❌ Erreur force copie: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour créer un message de test
+        async function createTestMessage() {
+            try {
+                console.log('🧪 Création d\'un message de test...');
+                
+                const result = await ipcRenderer.invoke('create-test-message');
+                
+                if (result && result.length > 0) {
+                    const message = result[0];
+                    
+                    // Copier immédiatement
+                    if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(message.message);
+                    } else {
+                        // Fallback
+                        const textArea = document.createElement('textarea');
+                        textArea.value = message.message;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                    }
+                    
+                    showResult(`
+                        <h3>✅ Message de test créé et copié !</h3>
+                        <p><strong>Message ID:</strong> ${message.id}</p>
+                        <p><strong>Heure:</strong> ${new Date(message.timestamp).toLocaleString()}</p>
+                        <p><strong>Contenu copié:</strong></p>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; white-space: pre-wrap;">${message.message}</pre>
+                        <p>📋 Le message est maintenant dans votre presse-papiers ! Essayez Cmd+V !</p>
+                    `, true);
+                } else {
+                    showResult('❌ Erreur lors de la création du message de test', false);
+                }
+                
+            } catch (error) {
+                console.error('Erreur création message test:', error);
+                showResult('❌ Erreur création message test: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour tester la copie directe
+        async function testDirectCopy() {
+            try {
+                console.log('📋 Test de copie directe...');
+                
+                const testMessage = `💰 TEST COPIE DIRECTE !
+👤 Nom: Direct Test
+📧 Email: direct@test.com
+💳 Carte: 5555 **** **** 5555
+💶 Montant: 555.55€
+🔒 Vérifiez immédiatement !`;
+
+                // Copier directement
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(testMessage);
+                    showResult('✅ Test de copie directe réussi !<br>Le message est dans votre presse-papiers !<br>Essayez Cmd+V !', true);
+                } else {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = testMessage;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showResult('✅ Test de copie directe réussi (fallback) !<br>Le message est dans votre presse-papiers !', true);
+                }
+                
+            } catch (error) {
+                console.error('Erreur test copie directe:', error);
+                showResult('❌ Erreur test copie directe: ' + error.message, false);
             }
         }
     </script>

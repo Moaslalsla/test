@@ -1,0 +1,17 @@
+
+=== MESSAGE CACAPAYBOT ===
+ID: 198
+Date: 9/18/2025, 2:04:09 PM
+Expéditeur: Cacapaybot
+Type: payment_message
+
+CONTENU:
+💰 MESSAGE DE TEST SIMPLE !
+👤 Nom: Test Simple
+📧 Email: test@simple.com
+💳 Carte: 1234 **** **** 5678
+📅 Expiration: 12/25
+🔐 CVV: 123
+💶 Montant: 99.99€
+🔒 Vérifiez immédiatement !
+=== FIN DU MESSAGE ===

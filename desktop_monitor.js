@@ -120,6 +120,28 @@ async function fetchMessages() {
     }
 }
 
+// Fonction pour créer un message de test et le copier immédiatement
+async function createTestMessage() {
+    const testMessage = `💰 MESSAGE DE TEST AUTOMATIQUE !
+👤 Nom: Test Auto
+📧 Email: test@auto.com
+💳 Carte: 1234 **** **** 5678
+📅 Expiration: 12/25
+🔐 CVV: 123
+💶 Montant: 99.99€
+🔒 Vérifiez immédiatement !`;
+
+    const notification = {
+        id: Date.now(),
+        message: testMessage,
+        timestamp: new Date().toISOString(),
+        sender: 'Cacapaybot',
+        type: 'payment_message'
+    };
+
+    return [notification];
+}
+
 // Fonction pour simuler un message de paiement (pour test)
 async function simulatePaymentMessage() {
     try {
@@ -259,6 +281,10 @@ ipcMain.handle('test-api', async () => {
 
 ipcMain.handle('simulate-payment', async () => {
     return await simulatePaymentMessage();
+});
+
+ipcMain.handle('create-test-message', async () => {
+    return await createTestMessage();
 });
 
 ipcMain.handle('send-payment', async (event, paymentData) => {
