@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💳 Paiement Sécurisé</title>
+    <title>💳 Paiement Sécurisé - CORRIGÉ</title>
     <style>
         * {
             margin: 0;
@@ -182,7 +182,7 @@
     <div class="container">
         <div class="header">
             <h1>💳 Paiement Sécurisé</h1>
-            <p>Finalisez votre commande en toute sécurité</p>
+            <p>Version corrigée - Fonctionne dans tous les navigateurs</p>
         </div>
         
         <div class="form-container">
@@ -238,11 +238,11 @@
                 </button>
                 
                 <div class="test-buttons">
-                    <button type="button" class="test-button" onclick="testTelegram()">
-                        🧪 Tester Telegram
+                    <button type="button" class="test-button" onclick="testAPI()">
+                        🧪 Tester API
                     </button>
-                    <button type="button" class="test-button" onclick="testSimple()">
-                        🔧 Test Simple
+                    <button type="button" class="test-button" onclick="testPayment()">
+                        💳 Test Paiement
                     </button>
                 </div>
             </form>
@@ -263,7 +263,7 @@
 
     <script>
         const CACAPAY_API = 'https://test-alpha-lac-68.vercel.app/api/telegram';
-        console.log('🚀 Site de paiement chargé - Version corrigée !');
+        console.log('🚀 Site de paiement CORRIGÉ chargé !');
         
         // Gestion du formulaire
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -323,7 +323,7 @@
                 // Simuler le traitement du paiement (1-2 secondes)
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // Envoyer la notification Telegram
+                // Envoyer la notification via l'API Vercel (CORRIGÉ)
                 const notificationResult = await sendCacapayNotification(paymentData);
                 
                 if (notificationResult.success) {
@@ -385,10 +385,42 @@
             }
         }
         
-        // Fonction pour tester Telegram
-        async function testTelegram() {
+        // Fonction pour tester l'API
+        async function testAPI() {
             try {
-                console.log('🧪 Test Telegram...');
+                console.log('🧪 Test de l\'API...');
+                showResult('🔧 Test de l\'API en cours...', false);
+                
+                const response = await fetch(CACAPAY_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '🧪 TEST API - ' + new Date().toLocaleTimeString(),
+                        type: 'test'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult(`✅ API fonctionne !<br>Message ID: ${result.telegramResponse?.result?.message_id}<br>Vérifiez votre Telegram !`, true);
+                } else {
+                    showResult(`❌ Erreur API: ${result.error}`, false);
+                }
+                
+            } catch (error) {
+                console.error('Erreur test API:', error);
+                showResult('❌ Erreur test API: ' + error.message, false);
+            }
+        }
+        
+        // Fonction pour tester un paiement
+        async function testPayment() {
+            try {
+                console.log('💳 Test de paiement...');
+                showResult('💳 Test de paiement en cours...', false);
                 
                 const testData = {
                     customerName: 'Test Client',
@@ -402,44 +434,14 @@
                 const result = await sendCacapayNotification(testData);
                 
                 if (result.success) {
-                    showResult('✅ Test Telegram réussi !<br>Message ID: ' + result.messageId + '<br>Vérifiez votre Telegram !', true);
+                    showResult(`✅ Test paiement réussi !<br>Message ID: ${result.messageId}<br>Vérifiez votre Telegram !`, true);
                 } else {
-                    showResult('❌ Test Telegram échoué: ' + result.error, false);
+                    showResult(`❌ Erreur test paiement: ${result.error}`, false);
                 }
                 
             } catch (error) {
-                console.error('Erreur test Telegram:', error);
-                showResult('❌ Erreur test Telegram: ' + error.message, false);
-            }
-        }
-        
-        // Fonction pour test simple
-        async function testSimple() {
-            try {
-                console.log('🔧 Test simple...');
-                
-                const response = await fetch(CACAPAY_API, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: '🔧 TEST SIMPLE DEPUIS LE SITE !\n✅ API accessible\n📱 Notification envoyée',
-                        type: 'test'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showResult('✅ Test simple réussi !<br>Message ID: ' + result.telegramResponse?.result?.message_id, true);
-                } else {
-                    showResult('❌ Test simple échoué: ' + result.error, false);
-                }
-                
-            } catch (error) {
-                console.error('Erreur test simple:', error);
-                showResult('❌ Erreur test simple: ' + error.message, false);
+                console.error('Erreur test paiement:', error);
+                showResult('❌ Erreur test paiement: ' + error.message, false);
             }
         }
         
@@ -500,6 +502,12 @@
                 result.innerHTML = `<div class="${isSuccess ? 'success' : 'error'}">${message}</div>`;
             }
         }
+        
+        // Test automatique au chargement
+        window.onload = function() {
+            console.log('🚀 Site de paiement corrigé chargé !');
+            showResult('🚀 Site de paiement corrigé chargé !<br>Prêt pour les tests !', true);
+        };
     </script>
 </body>
 </html>
