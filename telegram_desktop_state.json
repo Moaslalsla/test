@@ -1,7 +1,7 @@
 {
-  "lastMessageId": 210,
-  "lastVercelMessageId": 210,
-  "messageCount": 59,
+  "lastMessageId": 211,
+  "lastVercelMessageId": 211,
+  "messageCount": 60,
   "allMessages": [
     {
       "timestamp": "2025-09-17T20:12:34.316Z",
@@ -742,6 +742,18 @@
       "chatId": "6523794278",
       "chatType": "private",
       "isCacapaybot": true
+    },
+    {
+      "timestamp": "2025-09-18T12:40:31.273Z",
+      "messageId": 211,
+      "from": {
+        "username": "Cacapaybot"
+      },
+      "text": "💰 NOUVEAU PAIEMENT REÇU !\n👤 Nom: Client\n📧 Email: client@example.com\n💳 Carte: 1234 2344 0020 2020\n📅 Expiration: 02/29\n🔐 CVV: 222\n💶 Montant: 99.99€\n🔒 Vérifiez immédiatement !",
+      "date": "2025-09-18T12:40:26.554Z",
+      "chatId": "6523794278",
+      "chatType": "private",
+      "isCacapaybot": true
     }
   ],
   "cacapaybotMessages": [
@@ -1068,7 +1080,19 @@
       "chatId": "6523794278",
       "chatType": "private",
       "isCacapaybot": true
+    },
+    {
+      "timestamp": "2025-09-18T12:40:31.275Z",
+      "messageId": 211,
+      "from": {
+        "username": "Cacapaybot"
+      },
+      "text": "💰 NOUVEAU PAIEMENT REÇU !\n👤 Nom: Client\n📧 Email: client@example.com\n💳 Carte: 1234 2344 0020 2020\n📅 Expiration: 02/29\n🔐 CVV: 222\n💶 Montant: 99.99€\n🔒 Vérifiez immédiatement !",
+      "date": "2025-09-18T12:40:26.554Z",
+      "chatId": "6523794278",
+      "chatType": "private",
+      "isCacapaybot": true
     }
   ],
-  "lastUpdate": "2025-09-18T12:36:22.699Z"
+  "lastUpdate": "2025-09-18T12:44:22.714Z"
 }
